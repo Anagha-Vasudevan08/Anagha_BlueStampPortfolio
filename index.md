@@ -85,9 +85,11 @@ Don't forget to place the link of where to buy each component inside the quotati
 # Starter Project: Retro Game Soldering Kit
 // link to vid
 
+
+
 # Summary:
 
-I chose this retro game soldering kit because I wanted something I could use everyday. The way it works is 
+I chose this retro game soldering kit because I wanted something I could use everyday. The way it works is there is a power on button which when you press it clicks down and completes a circuit which allows the game to power on. Then when its powered on there are options to play 4 different games which we can get by clicking the 4 buttons under the screen. This is a precoded game so the main point is to build and use soldering to put the game together. I used a USB socket and connected it to an external power source to power the game, but there is also the option of using a battery pack and wires to turn the game on. 
 
 
 # Components Used:
