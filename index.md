@@ -82,6 +82,34 @@ Don't forget to place the link of where to buy each component inside the quotati
 | Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
 | Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
 
+Starer Project: Retro Game Soldering Kit
+
+
+Summary:
+
+I chose this retro game soldering kit because I wanted something I could use everyday. The way it works is 
+
+
+Components Used:
+- USB Socket (5V)
+- Dot Matrix 16*8
+- Screws and Nuts
+- Digital Tube (Timer)
+- Capacitance
+- Keys
+- Buzzer
+- Power Switch
+- Battery Box
+- Wire
+- Hex Copper Pillars
+- Key Cap
+
+Challenges:
+Some challenges I faced was soldering without melting the plastic portion of the board off. Also soldering the wires from the battery pack into the designated area because of how thin the wires were. Since I had trouble with the wiring of the batteries, I used the USB Socket to connect it to an external power source like a computer or a plug to power the game. Another challenge I faced was with the USB socket showing through the sides of the glass, I took the game apart soldered the USB Socket to the board and then put the sides together for it to work. 
+
+
+
+
 # Other Resources/Examples
 One of the best parts about Github is that you can view how other people set up their own work. Here are some past BSE portfolios that are awesome examples. You can view how they set up their portfolio, and you can view their index.md files to understand how they implemented different portfolio components.
 - [Example 1](https://trashytuber.github.io/YimingJiaBlueStamp/)
