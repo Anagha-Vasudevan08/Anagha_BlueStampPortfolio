@@ -60,16 +60,113 @@ Here's where you'll put images of your schematics. [Tinkercad](https://www.tinke
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
 
 ```c++
+// this sketch will allow you to bypass the Atmega chip
+// and connect the fingerprint sensor directly to the USB/Serial
+// chip converter.
+
+// Red connects to +5V
+// Black connects to Ground
+// White goes to Digital 0
+// Green goes to Digital 1
+
+#include <Servo.h>
+#include <Keypad.h>
+#include <Adafruit_Fingerprint.h>
+
+
+Servo servo;
+String input = "";
+String password = "#3575";
+
+const byte ROWS = 4;
+const byte COLS = 3;
+
+char keys[ROWS][COLS] = 
+{
+{'1', '2', '3'},
+{'4', '5', '6'},
+{'7', '8', '9'},
+{'*', '0', '#'}
+};
+
+byte rowsPins[ROWS] = {9, 8, 10, 11};
+byte colsPin[COLS] = {5, 6, 7};
+int attempts = 5;
+int angle = 0;
+
+
+Keypad keypad = Keypad(makeKeymap(keys), rowsPins, colsPin, ROWS, COLS);
+
+
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  Serial.println("Hello World!");
-}
 
+Serial.begin(9600);
+  servo.attach(3); 
+  servo.write(0);
+
+
+}
 void loop() {
-  // put your main code here, to run repeatedly:
 
-}
+
+  
+
+  char key = keypad.getKey();
+
+
+  if (key != NO_KEY)
+  {
+    Serial.println("key pressed");
+
+  Serial.print(key);
+
+  if (key == '*') // if astericks, clear
+  {
+    input = "";
+
+  }
+  else{
+  input += key;
+  }
+    Serial.print("Current input: ");
+    Serial.println(input);
+
+
+
+  if (input.length() > 1 and key == "#")
+  {
+    Serial.println("Start with '#' before entering passsword");
+    input = "";
+  }
+
+  if (input.length() == 5){
+      Serial.print(input);
+      if (input == password){
+        // TODO : allow servo to move accordingly
+        Serial.println("Cleared, enter fingerprint now");
+        angle = 180;
+        servo.write(angle);
+
+      }
+      else {
+        Serial.print("Password is incorrect ");
+
+        Serial.print(attempts);
+
+        Serial.print(" attempts left");
+
+        attempts  = attempts - 1;
+        input = "";
+    }
+    }
+    }
+
+
+   // add code for fingerprint too
+    
+  }
+
+
 ```
 
 # Bill of Materials
