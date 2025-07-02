@@ -83,6 +83,7 @@ Here's where you'll put your code. The syntax below places it into a block of co
 #include <Servo.h>
 #include <Keypad.h>
 #include <Adafruit_Fingerprint.h>
+#include <LiquidCrystal_I2C.h>
 
 
 Servo servo;
@@ -91,6 +92,8 @@ String password = "#3575";
 
 const byte ROWS = 4;
 const byte COLS = 3;
+const int buzzer = 9;
+
 
 char keys[ROWS][COLS] = 
 {
@@ -108,12 +111,53 @@ int angle = 0;
 
 Keypad keypad = Keypad(makeKeymap(keys), rowsPins, colsPin, ROWS, COLS);
 
+SoftwareSerial mySerial(2, 3);
+Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
+
+
+LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+bool passwordCleared = false;
+
+int getFingerprintID() {
+  uint8_t p = finger.getImage();
+  if (p != FINGERPRINT_OK) return -1;
+
+  p = finger.image2Tz();
+  if (p != FINGERPRINT_OK) return -1;
+
+  p = finger.fingerSearch();
+  if (p != FINGERPRINT_OK) return -1;
+
+  Serial.print("Found ID #"); Serial.println(finger.fingerID);
+  return finger.fingerID;
+}
 
 void setup() {
 
 Serial.begin(9600);
-  servo.attach(3); 
+
+ mySerial.begin(57600);
+  finger.begin(57600);
+
+  servo.attach(4); 
   servo.write(0);
+
+  pinMode(buzzer, OUTPUT)
+
+ 
+
+  if (finger.verifyPassword()) {
+    Serial.println("Fingerprint sensor found!");
+  } else {
+    Serial.println("Fingerprint sensor not found :(");
+  }
+
+  lcd.init();      
+  lcd.backlight();    
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Enter password:");
 
 
 }
@@ -135,45 +179,141 @@ void loop() {
   {
     input = "";
 
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Cleared, Retry!");
+
   }
-  else{
+ // else{
   input += key;
-  }
-    Serial.print("Current input: ");
+
+   Serial.print("Current input: ");
     Serial.println(input);
 
+   lcd.setCursor(0, 1);
+    lcd.print(input);
 
+
+ // }
 
   if (input.length() > 1 and key == "#")
   {
+
+    
     Serial.println("Start with '#' before entering passsword");
-    input = "";
+
+    lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Start with #");
+      input = "";
+      return;
   }
 
   if (input.length() == 5){
       Serial.print(input);
       if (input == password){
-        // TODO : allow servo to move accordingly
         Serial.println("Cleared, enter fingerprint now");
-        angle = 180;
-        servo.write(angle);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Correct!");
+          lcd.setCursor(0,1);
+          lcd.print("Scan finger now");
 
-      }
-      else {
-        Serial.print("Password is incorrect ");
+                  int fID = -1;
+          unsigned long startTime = millis();
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("Waiting for");
+          lcd.setCursor(0, 1);
+          lcd.print("finger...");
+          Serial.println("Waiting for finger for 10 seconds...");
 
-        Serial.print(attempts);
+          while (millis() - startTime < 10000) {  // Wait for 10 seconds
+            fID = getFingerprintID();
+            if (fID > 0) break;  // Found a fingerprint
+          }
 
-        Serial.print(" attempts left");
+          if (fID == 4) {
+            Serial.println("Fingerprint ID 4 Identified");
+            lcd.clear();
+            lcd.setCursor(4, 1);
+            lcd.print("Fingerprint");
+            lcd.setCursor(4, 2);
+            lcd.print("Identified!");
+            delay(2000);
+            lcd.clear();
+            lcd.setCursor(2, 1);
+            lcd.print("Will now unlock");
+            angle = 180;
+            servo.write(angle);
+          } else {
+            Serial.println("Wrong fingerprint or try again");
+            attempts--;
+            input = "";
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Wrong finger!");
+            lcd.setCursor(0, 1);
+            lcd.print(String(attempts) + " attempts left");
+            delay(3000);
+
+            if (attempts <= 0) {
+              lcd.clear();
+              lcd.setCursor(0, 0);
+              lcd.print("Too many fails!");
+              servo.write(0);  // Lock (optional)
+              while (true);    // Stop everything
+            tone(buzzerPin, 1000);
+            delay(5000);
+            noTone(buzzerPin);
+
+            }
+input = "";
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Enter password:");
+            
+            return;
+          }
+
+
+          }
+          else {
+            Serial.print("Password is incorrect");
+
+            Serial.print(attempts);
+
+            Serial.print(" attempts left");
+
+            lcd.clear();
+              lcd.setCursor(0,0);
+              lcd.print("Password is wrong");
+              lcd.setCursor(10, 1);
+              lcd.print(attempts);
+              lcd.setCursor(2,2);
+              lcd.print(" attempts left");
+                      delay(3000);
+
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Enter password:");
+
+
+
 
         attempts  = attempts - 1;
         input = "";
-    }
-    }
-    }
+        }
+      }
+    }    
+  }
 
+  // buzzer and push button figure out what and messages
+  // do cutting it and figuring out how it opens so what to code for that
+  // toggle switch button just for on and off set up? or before
+  // see if button is even needed cuz its like 9V powered
+  // buzzer found
 
-   // add code for fingerprint too
     
   }
 
