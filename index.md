@@ -46,6 +46,7 @@ I faced a few challenges with building this and putting it together. So first th
 
 # Wiring Schematics
 
+![Wiring Image](Wiring.png)
 
 # First Milestone
 
