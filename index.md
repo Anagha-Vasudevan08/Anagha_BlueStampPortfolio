@@ -15,8 +15,11 @@ My poject is the Fingerprint ID safe with a keypad. This is a safe box with a ke
 
 My second milestone was to start putting all my thnigs together in my box. Dimension and cut up my box and get started with one of my modifications. I also started putting together my servo lock mechanism how I would be doing it. So for cutting my box I cut holes for my fingerprint sensor, LCD Scnree, and keypad using a dremmel and drill. Then I screwed these in. For one of my modofications I made a box inside the safe thats closed off but you can open and that is a very small box containing my arduino, my wires, bread board, etc. So I cut up wood for that box and for the side I used a mini metal bracket to connect the sides of the box and my wood. Then for the top piece of wood that can come off and on I used a hinge attached to the side and the top making the top of the mini box to easily come up so I can access the wiring. In the side wall I drilled a small hole so I can fit the wires for my servo through and the servo can be in a seperate box. I also changed the way my servo mechanism worked. I am using a wooden dowel attached to the servo arm. The servo arm I cut in half so it can be attached to the wall. I have screw eye rings which are attached to the top of the box and the side of the box and the wooden dowel goes through them when it should lick. 
 
-# Challenges
+# Challenges 
 I faced a few challenges with building this and putting it together. So first the woodscrews that I was using for hinges and things were so long that they would stick through the outside of the box if I screwed them in fully. To fix this I stuck a 2 washers and one nut in front of the hinge so that when I screwed it, the screw wouldn't poke through the other side of the box. I also had a problem with all my wires still showing with the side wall and if I add a top wall I didn't want to seal it off completly incase I needed to make changes to the wiring. So I added a hinge to the top and side so that it can easily lift up and down when I want. I also had a challenge on what I should do for my servo mechanism because my original plan 
+
+# Plan
+So my plan for my next steps is to think of more modifications I want to do. Also maybe spray paint my box black to give it a clean polished look. I also want to add black electrical tape around the edges of the LCD so it appears smoother because the dremmel cut wasn't that smooth on the box. Sanding it more will make it to big so I want to add electrical tape. 
 
 
 
