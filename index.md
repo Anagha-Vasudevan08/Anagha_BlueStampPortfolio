@@ -9,11 +9,6 @@ My poject is the Fingerprint ID safe with a keypad. This is a safe box with a ke
 
 # Second Milestone
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/y3VAmNlER5Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/iwInNOWHW_U?si=CAzmF1iiaMS-EGuS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/iwInNOWHW_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
 
 My second milestone was to start putting all my thnigs together in my box. Dimension and cut up my box and get started with one of my modifications. I also started putting together my servo lock mechanism how I would be doing it. So for cutting my box I cut holes for my fingerprint sensor, LCD Scnree, and keypad using a dremmel and drill. Then I screwed these in. For one of my modofications I made a box inside the safe thats closed off but you can open and that is a very small box containing my arduino, my wires, bread board, etc. So I cut up wood for that box and for the side I used a mini metal bracket to connect the sides of the box and my wood. Then for the top piece of wood that can come off and on I used a hinge attached to the side and the top making the top of the mini box to easily come up so I can access the wiring. In the side wall I drilled a small hole so I can fit the wires for my servo through and the servo can be in a seperate box. I also changed the way my servo mechanism worked. I am using a wooden dowel attached to the servo arm. The servo arm I cut in half so it can be attached to the wall. I have screw eye rings which are attached to the top of the box and the side of the box and the wooden dowel goes through them when it should lick. 
 
@@ -24,10 +19,10 @@ I faced a few challenges with building this and putting it together. So first th
 So my plan for my next steps is to think of more modifications I want to do. Also maybe spray paint my box black to give it a clean polished look. I also want to add black electrical tape around the edges of the LCD so it appears smoother because the dremmel cut wasn't that smooth on the box. Sanding it more will make it to big so I want to add electrical tape. 
 
 
-
 # First Milestone
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/iwInNOWHW_U?si=CAzmF1iiaMS-EGuS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iwInNOWHW_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 
 My first milestone was to wire up all my sensors to my arduino and breadboard. Also to start my coding for the keypad by printing out different things when I input something into the keypad. The sensors I wired to my arduino and breadboard was an on and off switch, fingerprint sensor, 3 by 4 keypad, LCD screen, and servo motor. I first wired up all the black wires to ground and red wires to 5V. Then i wired the other wires to different pins in the arduino. My on and off button takes less voltage so I wired it to the breadboard and used a resister to make sure it was accepting the right amount of power. I finished all of the wiring part so now I just have to focus on a lot of the code to integrate all the sensors together and building the actual box. 
 
