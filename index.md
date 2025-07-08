@@ -25,7 +25,7 @@ So my plan for my next steps is to think of more modifications I want to do. Als
 
 # First Milestone
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/CaCazFBhYKs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iwInNOWHW_U?si=CAzmF1iiaMS-EGuS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 My first milestone was to wire up all my sensors to my arduino and breadboard. Also to start my coding for the keypad by printing out different things when I input something into the keypad. The sensors I wired to my arduino and breadboard was an on and off switch, fingerprint sensor, 3 by 4 keypad, LCD screen, and servo motor. I first wired up all the black wires to ground and red wires to 5V. Then i wired the other wires to different pins in the arduino. My on and off button takes less voltage so I wired it to the breadboard and used a resister to make sure it was accepting the right amount of power. I finished all of the wiring part so now I just have to focus on a lot of the code to integrate all the sensors together and building the actual box. 
 
@@ -353,8 +353,8 @@ Some challenges I faced was soldering without melting the plastic portion of the
 
 
 
-# Other Resources/Examples
+# Resources
 - Example 1: https://github.com/Gracewanggg/Grace_BSE_Portfolio
 - Example 2: https://learn.adafruit.com/biometric-security-box/program-and-test
+- 
 
-To watch the BSE tutorial on how to create a portfolio, click here.
