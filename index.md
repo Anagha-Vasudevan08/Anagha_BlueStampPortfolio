@@ -60,7 +60,7 @@ https://download.mikroe.com/documents/datasheets/R503_datasheet.pdf
 ![LCD Image](LCDD-layout.png)
 <br>
 
-**Figure #2 - Servo Layout** 
+**Figure #2 - Servo Layout**  
 ![LCD Image](SERVOO-layout.png)
 <br>
 
