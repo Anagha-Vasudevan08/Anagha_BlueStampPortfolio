@@ -55,6 +55,19 @@ My plan to complete my project is working on all the circuit wiring first and as
 
 https://download.mikroe.com/documents/datasheets/R503_datasheet.pdf   
 
+# ESP32 SCHEMATICS
+**Figure #1 - LCD Display Wiring**
+![LCD Image](LCDD-layout.png)
+<br>
+
+**Figure #2 - Servo Layout** 
+![LCD Image](SERVOO-layout.png)
+<br>
+
+**Figure #3 - Keypad Wiring**
+![LCD Image](KEYPADD-layout.png)
+<br>
+
 
 # Code
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
