@@ -90,46 +90,41 @@ https://download.mikroe.com/documents/datasheets/R503_datasheet.pdf
 
 
 ```c++
-// this sketch will allow you to bypass the Atmega chip
-// and connect the fingerprint sensor directly to the USB/Serial
-// chip converter.
-
-// Red connects to +5V
-// Black connects to Ground
-// White goes to Digital 0
-// Green goes to Digital 1
-
-#include <ESP32Servo.h>
+//libraries
 #include <Keypad.h>
 #include <Adafruit_Fingerprint.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <HardwareSerial.h>
 #include <WiFi.h>
-#include <HTTPClient.h>
- // insert your like passwords and personlaized SSID down I have removed mine. 
+#include <ESP32Servo.h>
+#include <ESP_Mail_Client.h>
+
+// WiFi defineing
 const char* ssid = "Stratford Guest";
-const char* wifiPassword = "";
+const char* wifiPassword = "SPBSchool@3800";
 
-const char* account_sid = "";
-const char* auth_token  = "";
+// Email credentials using the simple mail transfer protocol to define
+#define SMTP_HOST "smtp.gmail.com"
+#define SMTP_PORT 465
+#define AUTHOR_EMAIL "esp32codesend@gmail.com"
+#define AUTHOR_PASSWORD "twuvslmhxjlvaxhh"
+#define RECIPIENT_EMAIL "vasudevan.anagha@gmail.com"
 
-const char* from_number = "+";
-const char* to_number   = "+";
-
+// Servo + everythnig else  variables defining
 Servo servo;
 String input = "";
 String password1 = "#3575";
 String password2 = "#1234";
 String password3 = "#0000";
-String* currentPassword = &password1;
+String* currentPassword = &password1; //using poiknter to store the password1 value into currentpassword
 int selectedPassword = 0;
 
-bool changeMode = false;
-bool addMode = false;
-int passwordToChange = 0;
-int attempts = 4;
-bool unlocked = false;
+bool changeMode = false; //changinas password yes or no
+bool addMode = false; //adding new passsword yes or no
+int passwordToChange = 0; //password slot to change
+int attempts = 4; //num of attempts for like diong it
+bool unlocked = false;  //whether itsubnloced or locked determines also the screen its on
 int menuPage = 0;
 
 const byte ROWS = 4;
@@ -151,6 +146,7 @@ HardwareSerial mySerial(2);
 Adafruit_Fingerprint finger(&mySerial);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+// Generate a 4-digit OTP
 String generateOTP() {
   String otp = "#";
   for (int i = 0; i < 4; i++) {
@@ -159,26 +155,61 @@ String generateOTP() {
   return otp;
 }
 
-void sendSMS(String messageBody) {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    String url = "https://api.twilio.com/2010-04-01/Accounts/" + String(account_sid) + "/Messages.json";
+// Send OTP via Email
+void sendEmailOTP(String otp) {
+  SMTPSession smtp; //smtp session instance
+  SMTP_Message message; //smtp email instance 
 
-    http.begin(url);
-    http.setAuthorization(account_sid, auth_token);
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  smtp.debug(1); //debugging output
+  smtp.callback([](SMTP_Status status) {
+    Serial.println(status.info());
+    if (status.success()) {
+      Serial.println("Email sent successfully");
+    }
+  });
+//setup email server session
+  ESP_Mail_Session session;
+  session.server.host_name = SMTP_HOST;
+  session.server.port = SMTP_PORT;
+  session.login.email = AUTHOR_EMAIL;
+  session.login.password = AUTHOR_PASSWORD;
+  session.login.user_domain = "";
 
-    String postData = "To=" + String(to_number) + "&From=" + String(from_number) + "&Body=" + messageBody;
+//compose email like how it is
+  message.sender.name = "ESP32 Lock";
+  message.sender.email = AUTHOR_EMAIL;
+  message.subject = "Your OTP for Access";
+  message.addRecipient("User", RECIPIENT_EMAIL);
 
-    int code = http.POST(postData);
-    Serial.print("SMS Status: ");
-    Serial.println(code);
-    http.end();
-  } else {
-    Serial.println("WiFi not connected for SMS");
+  String body = "Your OTP is: " + otp;
+  message.text.content = body.c_str();
+
+//connecting to mail server
+  if (!smtp.connect(&session)) {
+    Serial.println("Failed to connect to mail server");
+    return;
   }
+
+//checking for email sending errors
+  if (!MailClient.sendMail(&smtp, &message)) {
+    Serial.print("Error sending Email, reason: ");
+    Serial.println(smtp.errorReason());
+  }
+
+  smtp.closeSession(); //close that connection smtp session
 }
 
+// Find the next free fingerprint ID
+int getNextFreeID() {
+  for (int id = 1; id < 127; id++) {
+    if (finger.loadModel(id) != FINGERPRINT_OK) {
+      return id;
+    }
+  }
+  return -1;
+}
+
+// Identify fingerprint
 int getFingerprintID() {
   uint8_t p = finger.getImage();
   if (p != FINGERPRINT_OK) return -1;
@@ -192,62 +223,144 @@ int getFingerprintID() {
   return finger.fingerID;
 }
 
+// Fingerprint enrollment process
 void enrollFingerprint() {
-  lcd.clear(); lcd.print("Place finger...");
+  lcd.clear();
+  lcd.print("Place finger...");
   unsigned long enrollStart = millis();
   while (finger.getImage() != FINGERPRINT_OK) {
     if (keypad.getKey()) {
-      lcd.clear(); 
+      lcd.clear();
       lcd.print("Cancelled");
-      delay(2000); 
+      delay(2000);
       return;
     }
     if (millis() - enrollStart > 15000) {
       lcd.clear();
-       lcd.print("Timeout");
+      lcd.print("Timeout");
       delay(2000);
-       return;
+      return;
     }
   }
 
   if (finger.image2Tz(1) != FINGERPRINT_OK) {
     lcd.clear();
     lcd.print("Failed step 1");
-    delay(2000); 
+    delay(2000);
     return;
   }
 
-  lcd.clear(); 
+  lcd.clear();
   lcd.print("Remove finger");
   delay(2000);
   lcd.clear();
-   lcd.print("Place again...");
+  lcd.print("Place again...");
   enrollStart = millis();
 
   while (finger.getImage() != FINGERPRINT_OK) {
     if (keypad.getKey()) {
-      lcd.clear(); 
+      lcd.clear();
       lcd.print("Cancelled");
-      delay(2000); 
+      delay(2000);
       return;
     }
     if (millis() - enrollStart > 15000) {
-      lcd.clear(); 
+      lcd.clear();
       lcd.print("Timeout");
-      delay(2000); 
+      delay(2000);
       return;
     }
   }
 
-  if (finger.image2Tz(2) != FINGERPRINT_OK || finger.createModel() != FINGERPRINT_OK || finger.storeModel(4) != FINGERPRINT_OK) {
-    lcd.clear(); 
+  if (finger.image2Tz(2) != FINGERPRINT_OK || finger.createModel() != FINGERPRINT_OK) {
+    lcd.clear();
     lcd.print("Failed to save");
-    delay(2000); 
+    delay(2000);
     return;
   }
 
-  lcd.clear(); lcd.print("FP Stored!");
+  int newID = getNextFreeID();
+  if (newID == -1) {
+    lcd.clear();
+    lcd.print("No space left");
+    delay(2000);
+    return;
+  }
+
+  if (finger.storeModel(newID) != FINGERPRINT_OK) {
+    lcd.clear();
+    lcd.print("Save failed");
+    delay(2000);
+    return;
+  }
+
+  lcd.clear();
+  lcd.print("Stored as ID:");
+  lcd.setCursor(0, 1);
+  lcd.print(newID);
   delay(2000);
+
+  unlocked = true;
+  input = "";
+}
+
+// Show masked passwords on LCD (last 2 digits only)
+void showPasswords() {
+  lcd.clear();
+  lcd.print("Pass 1: ****" + password1.substring(password1.length() - 2));
+  lcd.setCursor(0, 1);
+  lcd.print("Pass 2: ****" + password2.substring(password2.length() - 2));
+  lcd.setCursor(0, 2);
+  lcd.print("Pass 3: ****" + password3.substring(password3.length() - 2));
+  lcd.setCursor(0, 3);
+  lcd.print("Press any key");
+
+  while (!keypad.getKey()) {
+    delay(100);
+  }
+}
+
+// Delete fingerprint by ID (1-126)
+void deleteFingerprint() {
+  lcd.clear();
+  lcd.print("Del FP ID 1-126:");
+  String fpIDStr = "";
+  while (true) {
+    char key = keypad.getKey();
+    if (!key) continue;
+    if (key >= '0' && key <= '9') {
+      if (fpIDStr.length() < 3) { // max 3 digits
+        fpIDStr += key;
+        lcd.setCursor(fpIDStr.length() - 1, 1);
+        lcd.print(key);
+      }
+    } else if (key == '*') {
+      // Cancel deletion
+      lcd.clear();
+      lcd.print("Cancelled");
+      delay(2000);
+      return;
+    } else if (key == '#') {
+      // Confirm deletion
+      int id = fpIDStr.toInt();
+      if (id < 1 || id > 126) {
+        lcd.clear();
+        lcd.print("Invalid ID");
+        delay(2000);
+        return;
+      }
+      if (finger.deleteModel(id) == FINGERPRINT_OK) {
+        lcd.clear();
+        lcd.print("Deleted ID: ");
+        lcd.print(id);
+      } else {
+        lcd.clear();
+        lcd.print("Delete failed");
+      }
+      delay(2000);
+      return;
+    }
+  }
 }
 
 void setup() {
@@ -264,9 +377,11 @@ void setup() {
   WiFi.begin(ssid, wifiPassword);
   lcd.print("Connecting WiFi...");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500); Serial.print(".");
+    delay(500);
+    Serial.print(".");
   }
-  lcd.clear(); lcd.print("WiFi Connected!");
+  lcd.clear();
+  lcd.print("WiFi Connected!");
   delay(1000);
 
   if (finger.verifyPassword()) {
@@ -276,228 +391,274 @@ void setup() {
   }
 
   lcd.clear();
-  lcd.setCursor(0, 0); 
+  lcd.setCursor(0, 0);
   lcd.print("Select Password:");
   lcd.setCursor(0, 1);
-  lcd.print("Press 1 or 2 or 3");
+  lcd.print("Enter 1 or 2 or 3");
+  lcd.setCursor(0, 2);
+  lcd.print("# = Forgot Pass");
 }
 
 void loop() {
+  if (unlocked) {
+    while (true) {
+      lcd.clear();
+      if (menuPage == 0) {
+        lcd.setCursor(0, 0);
+        lcd.print("* = Change Pass");
+        lcd.setCursor(0, 1);
+        lcd.print("# = Add Pass");
+        lcd.setCursor(0, 2);
+        lcd.print("1 = Enroll FP");
+        lcd.setCursor(0, 3);
+        lcd.print("0 = More...");
+      } else {
+        lcd.setCursor(0, 0);
+        lcd.print("2 = Relock");
+        lcd.setCursor(0, 1);
+        lcd.print("3 = Forgot Pass");
+        lcd.setCursor(0, 2);
+        lcd.print("4 = View Pass");
+        lcd.setCursor(0, 3);
+        lcd.print("5 = Delete FP");
+      }
+
+      unsigned long menuStart = millis();
+      while (millis() - menuStart < 10000) {
+        char optKey = keypad.getKey();
+        if (!optKey) continue;
+        if (optKey == '0') {
+          menuPage = (menuPage + 1) % 2;
+          break;
+        }
+
+        if (menuPage == 0) {
+          if (optKey == '*') {
+            lcd.clear();
+            lcd.print("Change pass:");
+            lcd.setCursor(0, 1);
+            lcd.print("Press 1 or 2 or 3");
+            while (true) {
+              char changeKey = keypad.getKey();
+              if (changeKey == '1' || changeKey == '2' || changeKey == '3') {
+                passwordToChange = changeKey - '0';
+                changeMode = true;
+                input = "";
+                lcd.clear();
+                lcd.print("New password:");
+                lcd.setCursor(0, 1);
+                lcd.print("#xxxx format");
+                return;
+              }
+            }
+          } else if (optKey == '#') {
+            addMode = true;
+            input = "";
+            lcd.clear();
+            lcd.print("Add new pass:");
+            lcd.setCursor(0, 1);
+            lcd.print("#xxxx format");
+            return;
+          } else if (optKey == '1') {
+            enrollFingerprint();
+            return;
+          }
+        } else {
+          if (optKey == '2') {
+            servo.write(0);
+            unlocked = false;
+            selectedPassword = 0;
+            input = "";
+            lcd.clear();
+            lcd.print("Relocked!");
+            delay(2000);
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Select Password:");
+            lcd.setCursor(0, 1);
+            lcd.print("1-2-3 = Choose");
+            lcd.setCursor(0, 2);
+            lcd.print("# = Forgot Pass");
+            return;
+          } else if (optKey == '3') {
+            String otp = generateOTP();
+            password3 = otp;
+            lcd.clear();
+            lcd.print("Sending OTP...");
+            sendEmailOTP(otp);
+            delay(2000);
+            lcd.clear();
+            lcd.print("OTP sent!");
+            delay(2000);
+          } else if (optKey == '4') {
+            showPasswords();
+          } else if (optKey == '5') {
+            deleteFingerprint();
+          }
+        }
+      }
+      lcd.clear();
+      lcd.print("Timeout");
+      delay(2000);
+    }
+  }
+
   char key = keypad.getKey();
   if (!key) return;
 
+  // At password select stage
   if (selectedPassword != 1 && selectedPassword != 2 && selectedPassword != 3) {
-    if (key == '1') { currentPassword = &password1; selectedPassword = 1; }
-    else if (key == '2') { currentPassword = &password2; selectedPassword = 2; }
-    else if (key == '3') { currentPassword = &password3; selectedPassword = 3; }
-    else {
-      lcd.clear(); 
+    if (key == '1') {
+      currentPassword = &password1;
+      selectedPassword = 1;
+    } else if (key == '2') {
+      currentPassword = &password2;
+      selectedPassword = 2;
+    } else if (key == '3') {
+      currentPassword = &password3;
+      selectedPassword = 3;
+    } else if (key == '#') { // Forgot Password - send OTP by email only
+      String otp = generateOTP();
+      password3 = otp;
+      currentPassword = &password3;
+      selectedPassword = 3;
+      lcd.clear();
+      lcd.print("Sending OTP...");
+      sendEmailOTP(otp);
+      delay(2000);
+      lcd.clear();
+      lcd.print("OTP sent!");
+      lcd.setCursor(0, 1);
+      lcd.print("Enter password:");
+      input = "";
+      return;
+    } else {
+      lcd.clear();
       lcd.print("Invalid input");
-      delay(2000); 
+      delay(2000);
       return;
     }
-    lcd.clear(); 
+    lcd.clear();
     lcd.print("Enter password:");
-    input = ""; 
+    input = "";
     return;
   }
 
   if (key == '*') {
-    input = ""; 
+    input = "";
     lcd.clear();
-    lcd.setCursor(0, 0); 
+    lcd.setCursor(0, 0);
     lcd.print("Cleared. Retry:");
     return;
   }
 
   input += key;
-  lcd.setCursor(0, 1); lcd.print(input);
+  lcd.setCursor(0, 1);
+  lcd.print(input);
 
   if (input.length() > 1 && input[0] != '#') {
-    lcd.clear(); 
+    lcd.clear();
     lcd.print("Start with #");
-    input = ""; 
+    input = "";
     return;
   }
 
   if ((changeMode || addMode) && input.length() == 5) {
     if (changeMode) {
-      if (passwordToChange == 1) password1 = input;
-      else if (passwordToChange == 2) password2 = input;
-      else if (passwordToChange == 3) password3 = input;
+      if (passwordToChange == 1) {
+        password1 = input;
+      } else if (passwordToChange == 2) {
+        password2 = input;
+      } else if (passwordToChange == 3) {
+        password3 = input;
+      }
       lcd.clear();
-       lcd.print("Password changed");
+      lcd.print("Password changed");
     } else if (addMode) {
       password3 = input;
       lcd.clear();
-       lcd.print("Pass 3 added");
+      lcd.print("Pass 3 added");
     }
     delay(2000);
-    lcd.clear(); 
+    lcd.clear();
     lcd.print("Enter password:");
-    input = ""; 
+    input = "";
     changeMode = false;
-     addMode = false; 
-     passwordToChange = 0;
+    addMode = false;
+    passwordToChange = 0;
     return;
   }
 
   if (input.length() == 5) {
     if (input == password1 || input == password2 || input == password3) {
-      lcd.clear(); 
+      lcd.clear();
       lcd.print("Correct!");
-      lcd.setCursor(0, 1); 
+      lcd.setCursor(0, 1);
       lcd.print("Scan fingerprint");
 
       int fID = -1;
       unsigned long startTime = millis();
       while (millis() - startTime < 10000) {
         fID = getFingerprintID();
-        if (fID > 0) break;
+        if (fID > 0)
+          break;
       }
 
-      if (fID == 4) {
+      if (fID != -1) {
         lcd.clear();
-         lcd.print("Fingerprint OK");
-        delay(1000); 
-        lcd.clear(); 
+        lcd.print("FP OK, ID: ");
+        lcd.setCursor(0, 1);
+        lcd.print(fID);
+        delay(1000);
+        lcd.clear();
         lcd.print("Unlocking...");
-        servo.write(180);
-         unlocked = true;
+        servo.write(60);
+        unlocked = true;
         delay(2000);
-
-        while (true) {
-          lcd.clear();
-          if (menuPage == 0) {
-            lcd.setCursor(0, 0); 
-            lcd.print("* = Change Pass");
-            lcd.setCursor(0, 1);
-            lcd.print("# = Add Pass");
-            lcd.setCursor(0, 2); 
-            lcd.print("1 = Enroll FP");
-            lcd.setCursor(0, 3); 
-            lcd.print("0 = More...");
-          } else if (menuPage == 1) {
-            lcd.setCursor(0, 0);
-             lcd.print("2 = Relock");
-            lcd.setCursor(0, 1);
-            lcd.print("3 = Forgot Pass");
-            lcd.setCursor(0, 2);
-             lcd.print("0 = Back");
-            lcd.setCursor(0, 3);
-             lcd.print(" ");
-          }
-
-          unsigned long menuStart = millis();
-          while (millis() - menuStart < 10000) {
-            char optKey = keypad.getKey();
-            if (optKey == '0') {
-              menuPage = (menuPage + 1) % 2;
-              break;
-            }
-
-            if (menuPage == 0) {
-              if (optKey == '*') {
-                lcd.clear(); 
-                lcd.print("Change pass:");
-                lcd.setCursor(0, 1); 
-                lcd.print("Press 1/2/3");
-                while (true) {
-                  char changeKey = keypad.getKey();
-                  if (changeKey == '1' || changeKey == '2' || changeKey == '3') {
-                    passwordToChange = changeKey - '0';
-                    changeMode = true; input = "";
-                    lcd.clear(); 
-                    lcd.print("New password:");
-                    lcd.setCursor(0, 1); 
-                    lcd.print("#xxxx format");
-                    return;
-                  }
-                }
-              } else if (optKey == '#') {
-                addMode = true; input = "";
-                lcd.clear();
-                 lcd.print("Add new pass:");
-                lcd.setCursor(0, 1); 
-                lcd.print("#xxxx format");
-                return;
-              } else if (optKey == '1') {
-                enrollFingerprint(); return;
-              }
-            } else if (menuPage == 1) {
-              if (optKey == '2') {
-                servo.write(0); unlocked = false;
-                selectedPassword = 0; input = "";
-                lcd.clear(); 
-                lcd.print("Relocked!");
-                delay(2000);
-                lcd.clear(); 
-                lcd.print("Select Password:");
-                lcd.setCursor(0, 1); 
-                lcd.print("Press 1 or 2 or 3");
-                return;
-              } else if (optKey == '3') {
-                String otp = generateOTP();
-                password3 = otp;
-                lcd.clear(); 
-                lcd.print("Sending OTP...");
-                sendSMS("Your OTP is: " + otp);
-                lcd.clear(); 
-                lcd.print("OTP sent!");
-                delay(3000);
-              }
-            }
-          }
-
-          lcd.clear(); 
-          lcd.print("Timeout");
-          delay(2000);
-          lcd.clear();
-           lcd.print("Enter password:");
-          input = ""; 
-          return;
+        if (input == password3) {
+          password3 = "#0000"; // reset OTP password after use
         }
-
       } else {
         lcd.clear();
-         lcd.print("Wrong fingerprint");
+        lcd.print("Wrong fingerprint");
         attempts--;
-         delay(2000);
+        delay(2000);
         if (attempts <= 0) {
           lcd.clear();
-           lcd.print("Too many fails");
-          tone(buzzerPin, 1000); 
-          delay(5000); noTone(buzzerPin);
+          lcd.print("Too many fails");
+          tone(buzzerPin, 1000);
+          delay(5000);
+          noTone(buzzerPin);
           while (true) {
             lcd.setCursor(0, 0);
             lcd.print("System Locked!");
-            delay(1000); yield();
+            delay(1000);
+            yield();
           }
         }
-        lcd.clear(); 
-        lcd.print(String(attempts) + " attempts left");
-        delay(2000); 
         lcd.clear();
-         lcd.print("Enter password:");
+        lcd.print(String(attempts) + " attempts left");
+        delay(2000);
+        lcd.clear();
+        lcd.print("Enter password:");
       }
-
       input = "";
     } else {
       attempts--;
-      lcd.clear(); 
+      lcd.clear();
       lcd.print("Wrong password");
       lcd.setCursor(0, 1);
-       lcd.print(String(attempts) + " left");
+      lcd.print(String(attempts) + " left");
       delay(2000);
       if (attempts <= 0) {
         lcd.clear();
         lcd.print("Too many fails");
-        tone(buzzerPin, 1000); 
-        delay(5000); 
+        tone(buzzerPin, 1000);
+        delay(5000);
         noTone(buzzerPin);
-        while (1) {}
+        while (true) {}
       }
-      lcd.clear(); 
+      lcd.clear();
       lcd.print("Enter password:");
       input = "";
     }
