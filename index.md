@@ -13,11 +13,16 @@ My poject is the Fingerprint ID safe with a keypad. This is a safe box with a ke
 For my third milestone, my main goal was to complete the full integration of all my planned software modification into the ESP32 system as well as succesfully make an OTP code that would override the normal input incase someone forgets the password. 
 To begin with I made a menu screen that apperas on the LCD screen. This menu allows users to navigate through various feautres using the keypad. This is organized into two screens of options to keep the display clear and easy to use, users can switch between them by pressing the '0' key. This ensures that with many available options, its easy to use. 
 The options I added in my menu are:
+
 Add a new password: they can create and store a new password then click on that if they want it
+
 Change passwowrd: allows users to modify a previoiusly stored password.
 Add a fingerprint: they can add a fingerprint to an ID and there are 127 IDs that are available
+
 Delete a fingerprint: fingerprint deletion feature so allows users to delete fingerprints that are no longer needed
+
 Forgot password: this is a more advanced feauture and if the user forgots the password they can send an OTP to an email or something. 
+
 Throughout the process of developing this I focused on like one goal at a time to make it clean and not complicated and hard to code. Doing this made the process way faster and easier. 
 
 # Challenges
