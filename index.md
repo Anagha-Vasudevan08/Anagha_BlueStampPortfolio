@@ -9,7 +9,11 @@ My poject is the Fingerprint ID safe with a keypad. This is a safe box with a ke
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/AEdhSK_Sfzw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
+# Third Milestone
+My third milestone was to code all my modifications and also code my OTP password where I can send texts to my phone from the esp32. I was able to make a main menu full of different selections to pick to do. Such as I have an option to change passwords, add passwords, add a fingerprint, delete a fingerprint, forgot password (send OTP), and then 0 allows me to move between two screens to see all the options. 
 
+# Challenges
+Some challenges I had with this was one when I first coded my adding a fingerprint it always overrid my ID one instead of making a new ID. I used a for loop for the 127 different empty slots for the fingerprints to be able to change
 
 # Second Milestone
 My second milestone was to start putting all my thnigs together in my box. Dimension and cut up my box and get started with one of my modifications. I also started putting together my servo lock mechanism how I would be doing it. So for cutting my box I cut holes for my fingerprint sensor, LCD Scnree, and keypad using a dremmel and drill. Then I screwed these in. For one of my modofications I made a box inside the safe thats closed off but you can open and that is a very small box containing my arduino, my wires, bread board, etc. So I cut up wood for that box and for the side I used a mini metal bracket to connect the sides of the box and my wood. Then for the top piece of wood that can come off and on I used a hinge attached to the side and the top making the top of the mini box to easily come up so I can access the wiring. In the side wall I drilled a small hole so I can fit the wires for my servo through and the servo can be in a seperate box. I also changed the way my servo mechanism worked. I am using a wooden dowel attached to the servo arm. The servo arm I cut in half so it can be attached to the wall. I have screw eye rings which are attached to the top of the box and the side of the box and the wooden dowel goes through them when the servo movies. This would lock it in place. I also started with changing my project from an arduino uno to an esp32, so I can have a wifi connected microcontroller. I had to rewire all of my circuits, restest, and adjust my code a lot for it to be compatible with an esp32. 
@@ -80,72 +84,175 @@ https://download.mikroe.com/documents/datasheets/R503_datasheet.pdf
 // White goes to Digital 0
 // Green goes to Digital 1
 
-#include <Servo.h>
+#include <ESP32Servo.h>
 #include <Keypad.h>
 #include <Adafruit_Fingerprint.h>
 #include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+#include <HardwareSerial.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+ // insert your like passwords and personlaized SSID down I have removed mine. 
+const char* ssid = "Stratford Guest";
+const char* wifiPassword = "";
 
+const char* account_sid = "";
+const char* auth_token  = "";
+
+const char* from_number = "+";
+const char* to_number   = "+";
 
 Servo servo;
 String input = "";
-String password = "#3575";
+String password1 = "#3575";
+String password2 = "#1234";
+String password3 = "#0000";
+String* currentPassword = &password1;
+int selectedPassword = 0;
+
+bool changeMode = false;
+bool addMode = false;
+int passwordToChange = 0;
+int attempts = 4;
+bool unlocked = false;
+int menuPage = 0;
 
 const byte ROWS = 4;
 const byte COLS = 3;
-const int buzzer = 9;
+const int buzzerPin = 9;
 
-
-char keys[ROWS][COLS] = 
-{
-{'1', '2', '3'},
-{'4', '5', '6'},
-{'7', '8', '9'},
-{'*', '0', '#'}
+char keys[ROWS][COLS] = {
+  {'1', '2', '3'},
+  {'4', '5', '6'},
+  {'7', '8', '9'},
+  {'*', '0', '#'}
 };
 
-byte rowsPins[ROWS] = {9, 8, 10, 11};
-byte colsPin[COLS] = {5, 6, 7};
-int attempts = 5;
-int angle = 0;
+byte rowsPins[ROWS] = {27, 26, 33, 32};
+byte colsPins[COLS] = {13, 12, 14};
 
+Keypad keypad = Keypad(makeKeymap(keys), rowsPins, colsPins, ROWS, COLS);
+HardwareSerial mySerial(2);
+Adafruit_Fingerprint finger(&mySerial);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
-Keypad keypad = Keypad(makeKeymap(keys), rowsPins, colsPin, ROWS, COLS);
+String generateOTP() {
+  String otp = "#";
+  for (int i = 0; i < 4; i++) {
+    otp += String(random(0, 10));
+  }
+  return otp;
+}
 
-SoftwareSerial mySerial(2, 3);
-Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
+void sendSMS(String messageBody) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String url = "https://api.twilio.com/2010-04-01/Accounts/" + String(account_sid) + "/Messages.json";
 
+    http.begin(url);
+    http.setAuthorization(account_sid, auth_token);
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+    String postData = "To=" + String(to_number) + "&From=" + String(from_number) + "&Body=" + messageBody;
 
-bool passwordCleared = false;
+    int code = http.POST(postData);
+    Serial.print("SMS Status: ");
+    Serial.println(code);
+    http.end();
+  } else {
+    Serial.println("WiFi not connected for SMS");
+  }
+}
 
 int getFingerprintID() {
   uint8_t p = finger.getImage();
   if (p != FINGERPRINT_OK) return -1;
-
   p = finger.image2Tz();
   if (p != FINGERPRINT_OK) return -1;
-
   p = finger.fingerSearch();
   if (p != FINGERPRINT_OK) return -1;
 
-  Serial.print("Found ID #"); Serial.println(finger.fingerID);
+  Serial.print("Found ID #");
+  Serial.println(finger.fingerID);
   return finger.fingerID;
 }
 
+void enrollFingerprint() {
+  lcd.clear(); lcd.print("Place finger...");
+  unsigned long enrollStart = millis();
+  while (finger.getImage() != FINGERPRINT_OK) {
+    if (keypad.getKey()) {
+      lcd.clear(); 
+      lcd.print("Cancelled");
+      delay(2000); 
+      return;
+    }
+    if (millis() - enrollStart > 15000) {
+      lcd.clear();
+       lcd.print("Timeout");
+      delay(2000);
+       return;
+    }
+  }
+
+  if (finger.image2Tz(1) != FINGERPRINT_OK) {
+    lcd.clear();
+    lcd.print("Failed step 1");
+    delay(2000); 
+    return;
+  }
+
+  lcd.clear(); 
+  lcd.print("Remove finger");
+  delay(2000);
+  lcd.clear();
+   lcd.print("Place again...");
+  enrollStart = millis();
+
+  while (finger.getImage() != FINGERPRINT_OK) {
+    if (keypad.getKey()) {
+      lcd.clear(); 
+      lcd.print("Cancelled");
+      delay(2000); 
+      return;
+    }
+    if (millis() - enrollStart > 15000) {
+      lcd.clear(); 
+      lcd.print("Timeout");
+      delay(2000); 
+      return;
+    }
+  }
+
+  if (finger.image2Tz(2) != FINGERPRINT_OK || finger.createModel() != FINGERPRINT_OK || finger.storeModel(4) != FINGERPRINT_OK) {
+    lcd.clear(); 
+    lcd.print("Failed to save");
+    delay(2000); 
+    return;
+  }
+
+  lcd.clear(); lcd.print("FP Stored!");
+  delay(2000);
+}
+
 void setup() {
+  Serial.begin(115200);
+  mySerial.begin(57600, SERIAL_8N1, 16, 17);
 
-Serial.begin(9600);
-
- mySerial.begin(57600);
-  finger.begin(57600);
-
-  servo.attach(4); 
+  servo.attach(23);
   servo.write(0);
 
-  pinMode(buzzer, OUTPUT)
+  Wire.begin(21, 22);
+  lcd.init();
+  lcd.backlight();
 
- 
+  WiFi.begin(ssid, wifiPassword);
+  lcd.print("Connecting WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500); Serial.print(".");
+  }
+  lcd.clear(); lcd.print("WiFi Connected!");
+  delay(1000);
 
   if (finger.verifyPassword()) {
     Serial.println("Fingerprint sensor found!");
@@ -153,170 +260,234 @@ Serial.begin(9600);
     Serial.println("Fingerprint sensor not found :(");
   }
 
-  lcd.init();      
-  lcd.backlight();    
-  
-  lcd.setCursor(0, 0);
-  lcd.print("Enter password:");
-
-
+  lcd.clear();
+  lcd.setCursor(0, 0); 
+  lcd.print("Select Password:");
+  lcd.setCursor(0, 1);
+  lcd.print("Press 1 or 2 or 3");
 }
+
 void loop() {
-
-
-  
-
   char key = keypad.getKey();
+  if (!key) return;
 
-
-  if (key != NO_KEY)
-  {
-    Serial.println("key pressed");
-
-  Serial.print(key);
-
-  if (key == '*') // if astericks, clear
-  {
-    input = "";
-
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Cleared, Retry!");
-
-  }
- // else{
-  input += key;
-
-   Serial.print("Current input: ");
-    Serial.println(input);
-
-   lcd.setCursor(0, 1);
-    lcd.print(input);
-
-
- // }
-
-  if (input.length() > 1 and key == "#")
-  {
-
-    
-    Serial.println("Start with '#' before entering passsword");
-
-    lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Start with #");
-      input = "";
+  if (selectedPassword != 1 && selectedPassword != 2 && selectedPassword != 3) {
+    if (key == '1') { currentPassword = &password1; selectedPassword = 1; }
+    else if (key == '2') { currentPassword = &password2; selectedPassword = 2; }
+    else if (key == '3') { currentPassword = &password3; selectedPassword = 3; }
+    else {
+      lcd.clear(); 
+      lcd.print("Invalid input");
+      delay(2000); 
       return;
+    }
+    lcd.clear(); 
+    lcd.print("Enter password:");
+    input = ""; 
+    return;
   }
 
-  if (input.length() == 5){
-      Serial.print(input);
-      if (input == password){
-        Serial.println("Cleared, enter fingerprint now");
-          lcd.clear();
-          lcd.setCursor(0,0);
-          lcd.print("Correct!");
-          lcd.setCursor(0,1);
-          lcd.print("Scan finger now");
+  if (key == '*') {
+    input = ""; 
+    lcd.clear();
+    lcd.setCursor(0, 0); 
+    lcd.print("Cleared. Retry:");
+    return;
+  }
 
-                  int fID = -1;
-          unsigned long startTime = millis();
-          lcd.clear();
-          lcd.setCursor(0, 0);
-          lcd.print("Waiting for");
-          lcd.setCursor(0, 1);
-          lcd.print("finger...");
-          Serial.println("Waiting for finger for 10 seconds...");
+  input += key;
+  lcd.setCursor(0, 1); lcd.print(input);
 
-          while (millis() - startTime < 10000) {  // Wait for 10 seconds
-            fID = getFingerprintID();
-            if (fID > 0) break;  // Found a fingerprint
-          }
+  if (input.length() > 1 && input[0] != '#') {
+    lcd.clear(); 
+    lcd.print("Start with #");
+    input = ""; 
+    return;
+  }
 
-          if (fID == 4) {
-            Serial.println("Fingerprint ID 4 Identified");
-            lcd.clear();
-            lcd.setCursor(4, 1);
-            lcd.print("Fingerprint");
-            lcd.setCursor(4, 2);
-            lcd.print("Identified!");
-            delay(2000);
-            lcd.clear();
-            lcd.setCursor(2, 1);
-            lcd.print("Will now unlock");
-            angle = 180;
-            servo.write(angle);
-          } else {
-            Serial.println("Wrong fingerprint or try again");
-            attempts--;
-            input = "";
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Wrong finger!");
-            lcd.setCursor(0, 1);
-            lcd.print(String(attempts) + " attempts left");
-            delay(3000);
+  if ((changeMode || addMode) && input.length() == 5) {
+    if (changeMode) {
+      if (passwordToChange == 1) password1 = input;
+      else if (passwordToChange == 2) password2 = input;
+      else if (passwordToChange == 3) password3 = input;
+      lcd.clear();
+       lcd.print("Password changed");
+    } else if (addMode) {
+      password3 = input;
+      lcd.clear();
+       lcd.print("Pass 3 added");
+    }
+    delay(2000);
+    lcd.clear(); 
+    lcd.print("Enter password:");
+    input = ""; 
+    changeMode = false;
+     addMode = false; 
+     passwordToChange = 0;
+    return;
+  }
 
-            if (attempts <= 0) {
-              lcd.clear();
-              lcd.setCursor(0, 0);
-              lcd.print("Too many fails!");
-              servo.write(0);  // Lock (optional)
-              while (true);    // Stop everything
-            tone(buzzerPin, 1000);
-            delay(5000);
-            noTone(buzzerPin);
+  if (input.length() == 5) {
+    if (input == password1 || input == password2 || input == password3) {
+      lcd.clear(); 
+      lcd.print("Correct!");
+      lcd.setCursor(0, 1); 
+      lcd.print("Scan fingerprint");
 
-            }
-input = "";
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Enter password:");
-            
-            return;
-          }
-
-
-          }
-          else {
-            Serial.print("Password is incorrect");
-
-            Serial.print(attempts);
-
-            Serial.print(" attempts left");
-
-            lcd.clear();
-              lcd.setCursor(0,0);
-              lcd.print("Password is wrong");
-              lcd.setCursor(10, 1);
-              lcd.print(attempts);
-              lcd.setCursor(2,2);
-              lcd.print(" attempts left");
-                      delay(3000);
-
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Enter password:");
-
-
-
-
-        attempts  = attempts - 1;
-        input = "";
-        }
+      int fID = -1;
+      unsigned long startTime = millis();
+      while (millis() - startTime < 10000) {
+        fID = getFingerprintID();
+        if (fID > 0) break;
       }
-    }    
+
+      if (fID == 4) {
+        lcd.clear();
+         lcd.print("Fingerprint OK");
+        delay(1000); 
+        lcd.clear(); 
+        lcd.print("Unlocking...");
+        servo.write(180);
+         unlocked = true;
+        delay(2000);
+
+        while (true) {
+          lcd.clear();
+          if (menuPage == 0) {
+            lcd.setCursor(0, 0); 
+            lcd.print("* = Change Pass");
+            lcd.setCursor(0, 1);
+            lcd.print("# = Add Pass");
+            lcd.setCursor(0, 2); 
+            lcd.print("1 = Enroll FP");
+            lcd.setCursor(0, 3); 
+            lcd.print("0 = More...");
+          } else if (menuPage == 1) {
+            lcd.setCursor(0, 0);
+             lcd.print("2 = Relock");
+            lcd.setCursor(0, 1);
+            lcd.print("3 = Forgot Pass");
+            lcd.setCursor(0, 2);
+             lcd.print("0 = Back");
+            lcd.setCursor(0, 3);
+             lcd.print(" ");
+          }
+
+          unsigned long menuStart = millis();
+          while (millis() - menuStart < 10000) {
+            char optKey = keypad.getKey();
+            if (optKey == '0') {
+              menuPage = (menuPage + 1) % 2;
+              break;
+            }
+
+            if (menuPage == 0) {
+              if (optKey == '*') {
+                lcd.clear(); 
+                lcd.print("Change pass:");
+                lcd.setCursor(0, 1); 
+                lcd.print("Press 1/2/3");
+                while (true) {
+                  char changeKey = keypad.getKey();
+                  if (changeKey == '1' || changeKey == '2' || changeKey == '3') {
+                    passwordToChange = changeKey - '0';
+                    changeMode = true; input = "";
+                    lcd.clear(); 
+                    lcd.print("New password:");
+                    lcd.setCursor(0, 1); 
+                    lcd.print("#xxxx format");
+                    return;
+                  }
+                }
+              } else if (optKey == '#') {
+                addMode = true; input = "";
+                lcd.clear();
+                 lcd.print("Add new pass:");
+                lcd.setCursor(0, 1); 
+                lcd.print("#xxxx format");
+                return;
+              } else if (optKey == '1') {
+                enrollFingerprint(); return;
+              }
+            } else if (menuPage == 1) {
+              if (optKey == '2') {
+                servo.write(0); unlocked = false;
+                selectedPassword = 0; input = "";
+                lcd.clear(); 
+                lcd.print("Relocked!");
+                delay(2000);
+                lcd.clear(); 
+                lcd.print("Select Password:");
+                lcd.setCursor(0, 1); 
+                lcd.print("Press 1 or 2 or 3");
+                return;
+              } else if (optKey == '3') {
+                String otp = generateOTP();
+                password3 = otp;
+                lcd.clear(); 
+                lcd.print("Sending OTP...");
+                sendSMS("Your OTP is: " + otp);
+                lcd.clear(); 
+                lcd.print("OTP sent!");
+                delay(3000);
+              }
+            }
+          }
+
+          lcd.clear(); 
+          lcd.print("Timeout");
+          delay(2000);
+          lcd.clear();
+           lcd.print("Enter password:");
+          input = ""; 
+          return;
+        }
+
+      } else {
+        lcd.clear();
+         lcd.print("Wrong fingerprint");
+        attempts--;
+         delay(2000);
+        if (attempts <= 0) {
+          lcd.clear();
+           lcd.print("Too many fails");
+          tone(buzzerPin, 1000); 
+          delay(5000); noTone(buzzerPin);
+          while (true) {
+            lcd.setCursor(0, 0);
+            lcd.print("System Locked!");
+            delay(1000); yield();
+          }
+        }
+        lcd.clear(); 
+        lcd.print(String(attempts) + " attempts left");
+        delay(2000); 
+        lcd.clear();
+         lcd.print("Enter password:");
+      }
+
+      input = "";
+    } else {
+      attempts--;
+      lcd.clear(); 
+      lcd.print("Wrong password");
+      lcd.setCursor(0, 1);
+       lcd.print(String(attempts) + " left");
+      delay(2000);
+      if (attempts <= 0) {
+        lcd.clear();
+        lcd.print("Too many fails");
+        tone(buzzerPin, 1000); 
+        delay(5000); 
+        noTone(buzzerPin);
+        while (1) {}
+      }
+      lcd.clear(); 
+      lcd.print("Enter password:");
+      input = "";
+    }
   }
-
-  // buzzer and push button figure out what and messages
-  // do cutting it and figuring out how it opens so what to code for that
-  // toggle switch button just for on and off set up? or before
-  // see if button is even needed cuz its like 9V powered
-  // buzzer found
-
-    
-  }
-
+}
 
 ```
 
