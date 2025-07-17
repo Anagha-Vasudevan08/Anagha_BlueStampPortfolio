@@ -7,16 +7,17 @@ My poject is the Fingerprint ID safe with a keypad. This is a safe box with a ke
 | Anagha V | Leigh High School | Electrical and Computer Engineering | Incoming Senior
 
 
-
-
 # Third Milestone
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8u7v6ouedhc?start=1&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 For my third milestone, my main goal was to complete the full integration of all my planned software modification into the ESP32 system as well as succesfully make an OTP code that would override the normal input incase someone forgets the password. 
 To begin with I made a menu screen that apperas on the LCD screen. This menu allows users to navigate through various feautres using the keypad. This is organized into two screens of options to keep the display clear and easy to use, users can switch between them by pressing the '0' key. This ensures that with many available options, its easy to use. 
 The options I added in my menu are:
 
 Add a new password: they can create and store a new password then click on that if they want it
 
-Change passwowrd: allows users to modify a previoiusly stored password.
+Change password: allows users to modify a previously stored password.
 Add a fingerprint: they can add a fingerprint to an ID and there are 127 IDs that are available
 
 Delete a fingerprint: fingerprint deletion feature so allows users to delete fingerprints that are no longer needed
@@ -26,11 +27,12 @@ Forgot password: this is a more advanced feauture and if the user forgots the pa
 Throughout the process of developing this I focused on like one goal at a time to make it clean and not complicated and hard to code. Doing this made the process way faster and easier. 
 
 # Challenges
-Some challenges I had with this was one when I first coded my adding a fingerprint it always overrid my ID one instead of making a new ID. I used a for loop for the 127 different empty slots for the fingerprints to be able to change to the next ID each time we do it. 
+Some challenges I had with this was one when I first coded my adding a fingerprint it always overrid my ID one instead of making a new ID. I used a for loop for the 127 different empty slots for the fingerprints to be able to change to the next ID each time we do it. Also I had challenges with my code because the libraries I previously used for my arduino weren't all compatible with an esp32 ao I had to switch out the libraries and some of my code. 
+
+# Second Milestone
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/AEdhSK_Sfzw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-# Second Milestone
 My second milestone was to start putting all my thnigs together in my box. Dimension and cut up my box and get started with one of my modifications. I also started putting together my servo lock mechanism how I would be doing it. So for cutting my box I cut holes for my fingerprint sensor, LCD Scnree, and keypad using a dremmel and drill. Then I screwed these in. For one of my modofications I made a box inside the safe thats closed off but you can open and that is a very small box containing my arduino, my wires, bread board, etc. So I cut up wood for that box and for the side I used a mini metal bracket to connect the sides of the box and my wood. Then for the top piece of wood that can come off and on I used a hinge attached to the side and the top making the top of the mini box to easily come up so I can access the wiring. In the side wall I drilled a small hole so I can fit the wires for my servo through and the servo can be in a seperate box. I also changed the way my servo mechanism worked. I am using a wooden dowel attached to the servo arm. The servo arm I cut in half so it can be attached to the wall. I have screw eye rings which are attached to the top of the box and the side of the box and the wooden dowel goes through them when the servo movies. This would lock it in place. I also started with changing my project from an arduino uno to an esp32, so I can have a wifi connected microcontroller. I had to rewire all of my circuits, restest, and adjust my code a lot for it to be compatible with an esp32. 
 
 # Challenges 
