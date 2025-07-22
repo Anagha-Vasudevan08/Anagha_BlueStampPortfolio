@@ -783,31 +783,24 @@ void loop() {
 
 | **Part** | **Note** | **Price** | **Link** |
 |:--:|:--:|:--:|:--:|
-| Servo Motor | Lock Mechanism | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Keypad | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| LCD Screen | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Wooden Box | Safe | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Fingerprint Sensor | Checking Fingerprint | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Arduino Uno | Send Code interacts with Sensors | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| BreadBoard | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Jumper Wires | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Screws |  | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Metal Brackets | Lock Mechanism (if needed) | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/?th=1
-| ESP32 | Wifi connected microcontroller | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| 9V Adapter| Lock Mechanism (if needed) | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Servo Half Arms | Lock Mechanism (if needed) | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Wooden Dowel | Lock Mechanism (if needed) | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Jumper Wires | Lock Mechanism (if needed) | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Screws | Lock Mechanism (if needed) | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-
-
+| Arduino | Used to relay code to the devices attached to the arduino | $27.60 | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
+| Wooden Box | Used as the main body of the safe to hold all of the components | $17.88 | <a href="https://www.amazon.com/10-8x7x8x5-7-Inch-Unfinished-Project-Woodcraft-Keepsake/dp/B09TP79KMG/ref=asc_df_B09TP79KMG/?tag=hyprod-20&linkCode=df0&hvadid=693702993503&hvpos=&hvnetw=g&hvrand=7855882896698640904&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9032171&hvtargid=pla-1656049679726&mcid=09c514aa5dc832cf9e480c008ff2ccf2&gad_source=1&th=1"> Link </a> |
+| Servo Motor | Used to lock the box | $4.25 | <a href="https://www.amazon.com/Control-Angle180-Digital-Torque-Helicopter/dp/B07NQJ1VZ2"> Link </a> |
+| Keypad | Used to input the values pressed by the user | $4.95 | <a href= "https://www.digikey.com/en/products/detail/sparkfun-electronics/COM-14662/8702491?utm_adgroup=&utm_source=google&utm_medium=cpc&utm_campaign=PMax%20Shopping_Product_Low%20ROAS%20Categories&utm_term=&utm_content=&utm_id=go_cmp-20243063506_adg-_ad-__dev-c_ext-_prd-8702491_sig-CjwKCAjwg8qzBhAoEiwAWagLrBAjV71gNMRh6gSqnwGcmKKZgxfZONfA__3vwEc5cEfz6mZHZPNaxhoCMo0QAvD_BwE&gad_source=4&gclid=CjwKCAjwg8qzBhAoEiwAWagLrBAjV71gNMRh6gSqnwGcmKKZgxfZONfA__3vwEc5cEfz6mZHZPNaxhoCMo0QAvD_BwE"> Link </a> |
+| Fingerprint scanner | Used to scan the user's fingerprint | $39.95 | <a href="https://www.adafruit.com/product/4651"> Link </a> |
+| LCD display | Used to display the user's input and other messages | $5.99 | <a href="https://www.elecbee.com/en-29832-IIC-I2C-1602-Blue-Backlight-LCD-Display-Screen-Module-for-Arduino-products-that-work-with-official-Arduino-boards?utm_term=&utm_campaign=shopping_%E7%BE%8E%E5%9B%BD2021/03/05&utm_source=adwords&utm_medium=ppc&hsa_acc=9958698819&hsa_cam=12473735731&hsa_grp=115457242501&hsa_ad=502747062194&hsa_src=g&hsa_tgt=pla-294682000766&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3&gad_source=1&gclid=CjwKCAjwg8qzBhAoEiwAWagLrDYhfhUbbYnmmnm0Mdn34YCLbcvGuJFkkJEgVpdvvIMMb6UYsUD3EBoCIRcQAvD_BwE"> Link </a> |
+| Battery pack | Used to hold batteries | $0.99 | <a href="https://www.aliexpress.us/item/2255800085048686.html?src=google&src=google&albch=shopping&acnt=708-803-3821&slnk=&plac=&mtctp=&albbt=Google_7_shopping&gclsrc=aw.ds&albagn=888888&isSmbAutoCall=false&needSmbHouyi=false&src=google&albch=shopping&acnt=708-803-3821&slnk=&plac=&mtctp=&albbt=Google_7_shopping&gclsrc=aw.ds&albagn=888888&ds_e_adid=&ds_e_matchtype=&ds_e_device=c&ds_e_network=x&ds_e_product_group_id=&ds_e_product_id=en2255800085048686&ds_e_product_merchant_id=109226772&ds_e_product_country=US&ds_e_product_language=en&ds_e_product_channel=online&ds_e_product_store_id=&ds_url_v=2&albcp=19158444193&albag=&isSmbAutoCall=false&needSmbHouyi=false&gad_source=1&gclid=CjwKCAjwg8qzBhAoEiwAWagLrOpaej3k4efkp4YyWvfM8vmhTXSb_L1wvrkKTOeJnbjJjQ0pbtrG2xoCsD4QAvD_BwE&aff_fcid=c304c687bdc3452d9a6329fe3798d70d-1718824126454-00553-UneMJZVf&aff_fsk=UneMJZVf&aff_platform=aaf&sk=UneMJZVf&aff_trace_key=c304c687bdc3452d9a6329fe3798d70d-1718824126454-00553-UneMJZVf&terminal_id=404226348af640d894c68bcc06778bd1&afSmartRedirect=y&gatewayAdapt=glo2usa"> Link </a> |
+| Batteries | Used to power the safe | $14.89 | <a href="https://www.amazon.com/Coppertop-Batteries-Ingredients-Long-lasting-Household/dp/B002UXRXE6/ref=asc_df_B002UXRXE6/?tag=hyprod-20&linkCode=df0&hvadid=693464962511&hvpos=&hvnetw=g&hvrand=17727216277919997895&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9032171&hvtargid=pla-638867480103&psc=1&mcid=c945774d225c355481b304e5f5b0a960&gad_source=1"> Link </a> |
+| Button | Used to lock the box | $0.62 | <a href="https://www.walmart.com/ip/10-x-With-Momentary-Round-Head-Panel-Mount-SPST-2-Pin-Push-Button-Switch/2986283540?wmlspartner=wlpa&selectedSellerId=101230727"> Link </a> |
+| On-off Switch | Used to turn off the safe to conserve battery | $0.80 | <a href="https://www.amazon.com/DaierTek-250VAC-Rocker-KCD1-101-Plastic/dp/B07S2QJKTX?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&psc=1&smid=AVZNWT0O79W01"> Link </a> |
+| ESP-32 | wifi based microcontroller for sending text messages/email | $20 | <a href="https://www.amazon.com/DaierTek-250VAC-Rocker-KCD1-101-Plastic/dp/B07S2QJKTX?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&psc=1&smid=AVZNWT0O79W01"> Link </a> |
 
 
 
 
 # Starter Project: Retro Game Soldering Kit
-https://www.youtube.com/embed/Ftf7Nms5TLQ?si=cT8QTLggC5kSKzwF
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Ftf7Nms5TLQ?si=cT8QTLggC5kSKzwF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-pi
 
 # Summary:
 
