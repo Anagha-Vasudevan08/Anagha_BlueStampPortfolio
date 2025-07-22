@@ -55,6 +55,116 @@ I faced challenges with both the code and wiring for my first milestone. When I 
 # Plan
 My plan to complete my project is working on all the circuit wiring first and as I wire to test each motor/sensor to make sure everything is working seperately. Then to do all the code so I wrote the code for the keypad with the servo first. After this worked I added LCD displays for each part of the process for unlocking the safe, then I added the addition of needing a fingerprint to open the safe to the code. Then I will work on building the box and putting together everything. So I plan on cutting up the box like the holes for the LCD screen, fingerprint sensor, and keypad, insert those and screw them in. Then I alsoplan to add a modification for my second milestone which is adding like a sectioned off area which is where all my wires, breadboard, and arduino are in. That section is also closed from the top but it has a hinge door so its easy to access change up. 
 
+# Code First Milestone 
+
+``` c++
+// this sketch will allow you to bypass the Atmega chip
+// and connect the fingerprint sensor directly to the USB/Serial
+// chip converter.
+
+// Red connects to +5V
+// Black connects to Ground
+// White goes to Digital 0
+// Green goes to Digital 1
+
+#include <Servo.h>
+#include <Keypad.h>
+#include <Adafruit_Fingerprint.h>
+
+
+Servo servo;
+String input = "";
+String password = "#3575";
+
+const byte ROWS = 4;
+const byte COLS = 3;
+
+char keys[ROWS][COLS] = 
+{
+{'1', '2', '3'},
+{'4', '5', '6'},
+{'7', '8', '9'},
+{'*', '0', '#'}
+};
+
+byte rowsPins[ROWS] = {9, 8, 10, 11};
+byte colsPin[COLS] = {5, 6, 7};
+int attempts = 5;
+int angle = 0;
+
+
+Keypad keypad = Keypad(makeKeymap(keys), rowsPins, colsPin, ROWS, COLS);
+
+
+void setup() {
+
+Serial.begin(9600);
+  servo.attach(12); 
+  servo.write(0);
+
+
+}
+void loop() {
+
+
+  
+
+  char key = keypad.getKey();
+
+
+  if (key != NO_KEY)
+  {
+    Serial.println("key pressed");
+
+  Serial.print(key);
+
+  if (key == '*') // if astericks, clear
+  {
+    input = "";
+
+  }
+  else{
+  input += key;
+  }
+    Serial.print("Current input: ");
+    Serial.println(input);
+
+
+
+  if (input.length() > 1 and key == "#")
+  {
+    Serial.println("Start with '#' before entering passsword");
+    input = "";
+  }
+
+  if (input.length() == 5){
+      Serial.print(input);
+      if (input == password){
+        // TODO : allow servo to move accordingly
+        Serial.println("Cleared, enter fingerprint now");
+        angle = 180;
+        servo.write(angle);
+
+      }
+      else {
+        Serial.print("Password is incorrect ");
+
+        Serial.print(attempts);
+
+        Serial.print(" attempts left");
+
+        attempts  = attempts - 1;
+        input = "";
+    }
+    }
+    }
+
+
+   // add code for fingerprint too
+    
+  }
+
+```
 # Schematics 
 
 **Figure #7 - Keypad Wiring (credit: Makerguides)**
@@ -727,5 +837,5 @@ Some challenges I faced was soldering without melting the plastic portion of the
 # Resources
 - Example 1: https://github.com/Gracewanggg/Grace_BSE_Portfolio
 - Example 2: https://learn.adafruit.com/biometric-security-box/program-and-test
-- 
+  
 
