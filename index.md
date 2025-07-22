@@ -800,7 +800,7 @@ void loop() {
 
 # Starter Project: Retro Game Soldering Kit
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Ftf7Nms5TLQ?si=cT8QTLggC5kSKzwF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-pi
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Ftf7Nms5TLQ?start=0&controls=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 # Summary:
 
