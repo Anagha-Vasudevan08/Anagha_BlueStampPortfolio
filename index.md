@@ -1,6 +1,5 @@
-# Fingerprint ID Safe with Keypad
-My poject is the Fingerprint ID safe with a keypad. This is a safe box with a keypad sensor and fingerprint sensor to unlock it. After a person puts both the correct password and correct fingerprint in under 5 attempts total, the box will open. 
-
+# Biometric Safe with Fingerprint ID and Keypad
+My project is a biometric safe that uses both a keypad and a fingerprint sensor for secure access. The safe requires the correct password and a matching fingerprint to unlock. If a user successfully enters both within five total attempts, the box will open. In addition, the system is WiFi-enabled, allowing it to send alerts and log activity, when someone attempts to open it with incorrect information. 
 
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
