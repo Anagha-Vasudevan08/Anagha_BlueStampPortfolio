@@ -26,6 +26,8 @@ Forgot password: a more advanced feature where users can request a one-time pass
 
 Throughout the process of developing this, I focused on one goal at a time to keep everything clean and manageable. This approach made the coding process more organized and significantly easier to debug and integrate, ultimately making the overall development faster and more efficient.
 
+The final code and schematiscs for my project are at the bottom after my first milestone. 
+
 # Challenges
 Some challenges I encountered during this process included issues with my fingerprint implementation. When I first coded the feature, adding a fingerprint would always override ID 1 instead of creating a new ID. To fix this, I used a for loop to iterate through the 127 available empty slots, allowing each new fingerprint to be assigned to the next available ID.
 
