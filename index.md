@@ -1,6 +1,6 @@
 # Biometric Safe with Fingerprint ID and Keypad
-My project is a biometric safe that uses both a keypad and a fingerprint sensor for secure access. The safe requires the correct password and a matching fingerprint to unlock. If a user successfully enters both within five total attempts, the box will open. In addition, the system is WiFi-enabled, allowing it to send alerts and log activity, when someone attempts to open it with incorrect information. 
-
+My project is a multi-factor biometric safe that integrates a keypad and fingerprint sensor to provide secure authentication. The system requires both a correct password and a matching fingerprint within a limited number of attempts to unlock.
+To enhance security and usability, I implemented WiFi functionality using an ESP32, enabling real-time alerts and activity logging when incorrect access attempts occur. Additionally, I developed a one-time password (OTP) recovery system that allows users to regain access if the primary password is forgotten.
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
 | Anagha V | Leigh High School | Electrical and Computer Engineering | Incoming Senior
@@ -10,23 +10,23 @@ My project is a biometric safe that uses both a keypad and a fingerprint sensor 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/8u7v6ouedhc?start=1&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-For my third milestone, my main goal was to complete the full integration of all planned software modifications into the ESP32 system, as well as successfully implement a one-time password (OTP) feature that can override the normal password input in case a user forgets it.
-To begin, I developed a menu interface displayed on the LCD screen. This menu allows users to navigate through various features using the keypad. To keep the display clear and easy to use, the options are organized into two separate screens, and users can switch between them by pressing the ‘0’ key. This ensures that even with many available options, the system remains intuitive and user-friendly.
-The options I added to my menu include:
+For my third milestone, my primary objective was to complete the full software integration of all system components on the ESP32, while also implementing a secure and functional one-time password (OTP) recovery system.
+To achieve this, I designed and programmed a structured menu-based interface displayed on the LCD screen. This interface allows users to navigate through system features using the keypad. To maintain clarity and usability despite the number of features, I divided the interface into two pages. Users can seamlessly switch between these pages using the ‘0’ key, ensuring the system remains intuitive and easy to operate.
+The menu system includes the following features:
 
-Add a new password: allows users to create and store a new password, which they can select for authentication later.
+Add a new password: Enables users to create and store additional passwords, allowing flexibility in authentication.
 
-Change password: allows users to modify a previously stored password.
+Change password: Allows modification of an existing password, improving long-term usability.
 
-Add a fingerprint: allows users to enroll a fingerprint to an ID, with up to 127 available IDs.
+Add a fingerprint: Enables enrollment of fingerprints into the system, supporting up to 127 unique IDs.
 
-Delete a fingerprint: allows users to remove fingerprints that are no longer needed.
+Delete a fingerprint: Allows removal of stored fingerprints for security management.
 
-Forgot password: a more advanced feature where users can request a one-time password (OTP) sent externally, such as to an email, which can then be used to unlock the system.
+Forgot password (OTP): Generates and sends a one-time password externally (via email), which can temporarily override the stored password.
 
-Throughout the process of developing this, I focused on one goal at a time to keep everything clean and manageable. This approach made the coding process more organized and significantly easier to debug and integrate, ultimately making the overall development faster and more efficient.
+A major focus during this milestone was maintaining modularity in my code. By isolating each feature into its own function, I was able to debug and integrate components more efficiently. This structured approach significantly reduced complexity and made it easier to expand the system with additional features.
 
-The final code and schematiscs for my project are at the bottom after my first milestone. 
+The final code and schematics for my project are included below after my first milestone.
 
 # Challenges
 Some challenges I encountered during this process included issues with my fingerprint implementation. When I first coded the feature, adding a fingerprint would always override ID 1 instead of creating a new ID. To fix this, I used a for loop to iterate through the 127 available empty slots, allowing each new fingerprint to be assigned to the next available ID.
